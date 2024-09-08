@@ -12,16 +12,20 @@ class AppText {
   final internetNotConnectedText = TextStyle(color: Colors.black, fontSize: 18);
 
   // app bar title
-  final appBarTitle = TextStyle(color: Colors.white, fontSize: 20);
+  final appBarTitle =
+      TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold);
 
   // form field name textstyle
   final formFieldNameTitle =
       TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.bold);
 
 // radio button textstyle
-  final formRadioButtonText = TextStyle(fontSize: 18, color: Colors.black);
+  final formRadioButtonText =
+      TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w500);
 
-  //Global textfield text style ends
+// text field text style
+  final textFieldText =
+      TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w500);
 
   //Global textbutton text style starts
   final submiButton = TextStyle(color: Colors.purple[400]);

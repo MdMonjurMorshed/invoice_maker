@@ -5,6 +5,7 @@ import 'package:swad_electric__bill_maker/controllers/controller/form_controller
 import 'package:swad_electric__bill_maker/controllers/controller/internet_controller.dart';
 import 'package:swad_electric__bill_maker/controllers/controller/radio_button_controller.dart';
 import 'package:swad_electric__bill_maker/themes/app_theme.dart';
+import 'package:swad_electric__bill_maker/view/available_bluetooth_device.dart';
 
 class LandingPage extends StatelessWidget {
   const LandingPage({super.key});
@@ -464,6 +465,7 @@ class LandingPage extends StatelessWidget {
                               height: formContainerHeight,
                               width: formContainerWidth,
                               child: TextField(
+                                style: AppTheme.appText.textFieldText,
                                 cursorColor:
                                     AppTheme.appColor.textFieldCursorColor,
                                 textAlign: TextAlign.center,
@@ -499,6 +501,7 @@ class LandingPage extends StatelessWidget {
                               height: formContainerHeight,
                               width: formContainerWidth,
                               child: TextField(
+                                style: AppTheme.appText.textFieldText,
                                 cursorColor:
                                     AppTheme.appColor.textFieldCursorColor,
                                 textAlign: TextAlign.center,
@@ -547,6 +550,7 @@ class LandingPage extends StatelessWidget {
                               height: formContainerHeight,
                               width: formContainerWidth,
                               child: TextField(
+                                style: AppTheme.appText.textFieldText,
                                 readOnly: true,
                                 cursorColor:
                                     AppTheme.appColor.textFieldCursorColor,
@@ -581,6 +585,7 @@ class LandingPage extends StatelessWidget {
                               height: formContainerHeight,
                               width: formContainerWidth,
                               child: TextField(
+                                style: AppTheme.appText.textFieldText,
                                 cursorColor:
                                     AppTheme.appColor.textFieldCursorColor,
                                 textAlign: TextAlign.center,
@@ -616,6 +621,7 @@ class LandingPage extends StatelessWidget {
                               height: formContainerHeight,
                               width: formContainerWidth,
                               child: TextField(
+                                style: AppTheme.appText.textFieldText,
                                 readOnly: true,
                                 cursorColor:
                                     AppTheme.appColor.textFieldCursorColor,
@@ -686,13 +692,22 @@ class LandingPage extends StatelessWidget {
                                   width: mediaWidth / 4,
                                   child: Center(
                                       child: Obx(() => Text(
-                                          "${formController.totalAmmountText.value}"))),
+                                            "${formController.totalAmmountText.value}",
+                                            style:
+                                                AppTheme.appText.textFieldText,
+                                          ))),
                                 ),
                               ),
                               SizedBox(
                                 width: mediaWidth / 5,
                               ),
                               GestureDetector(
+                                onTap: () {
+                                  Get.to(
+                                    BlueToothDevicesNearBy(),
+                                    transition: Transition.rightToLeft,
+                                  );
+                                },
                                 child: Container(
                                   height: mediaWidth / 11,
                                   width: mediaWidth / 4,
