@@ -6,11 +6,16 @@ class BlueToothDevicesNearBy extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return  Scaffold(
-      appBar:AppBar(
+    return Scaffold(
+      appBar: AppBar(
         centerTitle: true,
-        title: Text('Bluetooth devices Nearby',style:AppTheme.appText.appBarTitle),
-      ) ,
+        title: Text('Bluetooth devices Nearby',
+            style: AppTheme.appText.appBarTitle),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+          onPressed: () {},
+          icon: Icon(Icons.search_rounded),
+          label: Text('Scan')),
     );
   }
 }
