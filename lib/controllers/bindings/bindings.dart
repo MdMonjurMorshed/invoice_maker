@@ -12,5 +12,6 @@ class DependencyInjection {
     Get.put<RadioButtonController>(RadioButtonController());
     Get.put<FormController>(FormController());
     Get.put<PrintController>(PrintController(), permanent: true);
+
   }
 }

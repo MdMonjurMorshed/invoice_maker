@@ -27,6 +27,10 @@ class AppText {
   final textFieldText =
       TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w500);
 
+// available Bluetooth device TextStyle
+  final availableBluetoothTextStyle =
+      TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w500);
+
   //Global textbutton text style starts
   final submiButton = TextStyle(color: Colors.purple[400]);
   final cancelButton = TextStyle(color: Colors.purple[400]);

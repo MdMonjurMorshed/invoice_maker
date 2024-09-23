@@ -7,13 +7,14 @@ import 'package:swad_electric__bill_maker/controllers/bindings/bindings.dart';
 import 'package:flutter/services.dart';
 
 void main() {
+   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
       statusBarIconBrightness: Brightness.dark));
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
 
-  runApp(const MyApp());
   DependencyInjection.init();
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
