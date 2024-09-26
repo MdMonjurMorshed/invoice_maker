@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:swad_electric__bill_maker/controllers/services/get_device_message.dart';
+import 'package:swad_electric__bill_maker/controllers/services/scan_bluetooth_devices.dart';
 
 class PrintController extends GetxController {
   RxList checkList = [].obs;
@@ -10,6 +11,12 @@ class PrintController extends GetxController {
     String data = await NormalMethodCall.getNormalMethodCallResult();
     print(data);
     return data;
+  }
+
+  Future<void> findBluetoothDevice() async {
+    var data = await FindBluetoothDeviceMethodCall
+        .getBluetoothDeviceMethodCallResult();
+    print(data);
   }
 
   // BluePrintPos bluePrintPos = BluePrintPos.instance;

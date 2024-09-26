@@ -62,7 +62,7 @@ class BlueToothDevicesNearBy extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton.extended(
           onPressed: () {
-            printController.getMethodCallData();
+            printController.findBluetoothDevice();
             // printController.scanBluetoothDevices();
           },
           icon: Icon(Icons.search_rounded),
