@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:swad_electric__bill_maker/controllers/bindings/bindings.dart';
 import 'package:swad_electric__bill_maker/controllers/controller/print_controller.dart';
+import 'package:swad_electric__bill_maker/controllers/services/get_device_message.dart';
+import 'package:swad_electric__bill_maker/controllers/services/scan_bluetooth_devices.dart';
 import 'package:swad_electric__bill_maker/themes/app_theme.dart';
 
 class BlueToothDevicesNearBy extends StatelessWidget {
@@ -13,15 +15,14 @@ class BlueToothDevicesNearBy extends StatelessWidget {
     final mediaHeight = MediaQuery.of(context).size.height;
     final mediaWidth = MediaQuery.of(context).size.width;
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: Text('Bluetooth devices Nearby',
-            style: AppTheme.appText.appBarTitle),
-      ),
-      body: SingleChildScrollView(
-        child: Center(
-          child: Text('')
-         // Obx(() => Column(children: []
+        appBar: AppBar(
+          centerTitle: true,
+          title: Text('Bluetooth devices Nearby',
+              style: AppTheme.appText.appBarTitle),
+        ),
+        body: SingleChildScrollView(
+          child: Center(child: Text('')
+              // Obx(() => Column(children: []
               //     List.generate(printController.devices.length, (index) {
               //   return Padding(
               //     padding: const EdgeInsets.only(top: 15),
@@ -57,16 +58,53 @@ class BlueToothDevicesNearBy extends StatelessWidget {
               //     ),
               //   );
               // }),
-             // )),
+              // )),
+              ),
         ),
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-          onPressed: () {
-            printController.findBluetoothDevice();
-            // printController.scanBluetoothDevices();
-          },
-          icon: Icon(Icons.search_rounded),
-          label: Text('Scan')),
-    );
+        floatingActionButton: FloatingActionButton.extended(
+            onPressed: () async {
+              var bluetoothStatus =
+                  await NormalMethodCall.checkBluetoothAdapter();
+
+              if (!bluetoothStatus) {
+                print("bluetooth not enabled");
+                showDialog(
+                    context: context,
+                    builder: (BuildContext contect) {
+                      return AlertDialog(
+                        title: Text("Bluetooth Not Enabled"),
+                        content: Text("Do you want to enable bluetooth?"),
+                        alignment: Alignment.center,
+                        actionsAlignment: MainAxisAlignment.spaceAround,
+                        actions: [
+                          ElevatedButton(
+                              onPressed: () {
+                                Get.back();
+                              },
+                              child: Text('no')),
+                          ElevatedButton(
+                              onPressed: () async {
+                                final bool enabled =
+                                    await NormalMethodCall.enableBluetooth();
+                                print("bluetooth enabled:${enabled}");
+                                if (enabled) {}
+                              },
+                              child: Text("yes")),
+                        ],
+                      );
+                    });
+              } else {
+                print("bluetooth is connected");
+                await printController.getBluetoothDevices();
+                print(
+                    "print controller device value:${printController.bluetoothDevices}");
+              }
+              // FindBluetoothDeviceMethodCall.checkBluetoothAdapter();
+              // printController.
+              // printController.findBluetoothDevice();
+              // printController.scanBluetoothDevices();
+            },
+            icon: Icon(Icons.search_rounded),
+            label: Text('Scan')));
   }
 }

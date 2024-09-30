@@ -1,16 +1,36 @@
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:swad_electric__bill_maker/controllers/services/get_device_message.dart';
 import 'package:swad_electric__bill_maker/controllers/services/scan_bluetooth_devices.dart';
 
 class PrintController extends GetxController {
   RxList checkList = [].obs;
+  RxBool bluetoothStatus = true.obs;
+  RxList bluetoothDevices = [].obs;
   // NormalMethodCall normalMethodCall = NormalMethodCall();
 
   Future<String> getMethodCallData() async {
     String data = await NormalMethodCall.getNormalMethodCallResult();
     print(data);
     return data;
+  }
+
+  Future<void> getBluetoothDevices() async {
+    print("controller called");
+    final devices = await NormalMethodCall.scanResultOfBluetoothDevice();
+    bluetoothDevices.value =
+        devices!.map((device) => Map<String, String>.from(device)).toList();
+    print(" scan device data data from method call: ${devices}");
+  }
+
+  Future<void> setBluetoothStatus() async {
+    String bluetoothString =
+        await FindBluetoothDeviceMethodCall.getBluetoothStatus();
+    if (bluetoothString == "enabled") {
+      bluetoothStatus.value = true;
+    }
+    if (bluetoothString == "disabled") {
+      bluetoothStatus.value = false;
+    }
   }
 
   Future<void> findBluetoothDevice() async {
