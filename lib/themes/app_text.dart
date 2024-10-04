@@ -31,47 +31,32 @@ class AppText {
   final availableBluetoothTextStyle =
       TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w500);
 
-  //Global textbutton text style starts
-  final submiButton = TextStyle(color: Colors.purple[400]);
-  final cancelButton = TextStyle(color: Colors.purple[400]);
-  //Global textbutton text style ends
+  final scanButtonTextStyle = TextStyle(fontSize: 25, color: Colors.white, fontWeight: FontWeight.w500);
 
-  // Login page theme starts
-  final loginHeader = TextStyle(color: Colors.purple[400], fontSize: 25);
-  final signUPTextBtn = TextStyle(
-    color: Colors.purple[400],
-    fontSize: 15,
-  );
-  final loginButtonText = const TextStyle(color: Colors.white);
-  final googleSigninBurronText = const TextStyle(color: Colors.white);
-  final orText = TextStyle(color: Colors.purple[400], fontSize: 25);
-  // login page theme ends
 
-  // signup page theme starts
-  final signupHeader = TextStyle(color: Colors.purple[400], fontSize: 25);
-  final loginTextBtn = TextStyle(
-    color: Colors.purple[400],
-    fontSize: 15,
-  );
-  final signupButtonText = const TextStyle(color: Colors.white);
 
-  // signup page theme ends
 
-  // Auction  page starts
 
-  final productLabelText = const TextStyle(color: Colors.red, fontSize: 20);
-  final bidButtonText = const TextStyle(
-    color: Colors.white,
-  );
+  // Bluetooth enable connection starts
+  final yesNoButtonText = TextStyle(color: Colors.black);
 
-  final tableTitleText = const TextStyle(fontSize: 20);
-  final tableHeaderText = const TextStyle(fontSize: 20);
-  final tableCellText = const TextStyle(fontSize: 18);
+  //Bluetooth enable connection ends
 
-  final winingGreeting = const TextStyle(fontSize: 25, color: Colors.red);
-  final winingDetails = const TextStyle(fontSize: 20, color: Colors.red);
 
-  // Auction page ends
+  // progress indicator text starts
+ final circularProgressIndicatorText = TextStyle(fontSize:18,color: Colors.black );
+  // progress indicator text ends
+
+
+  // inside app body text starts
+
+ final  appBodyGeneralText = TextStyle(fontSize:18,color: Colors.black );
+  final  appBodyHeaderText = TextStyle(fontSize:20,color: Colors.black );
+
+
+  // inside app body text ends
+
+
 
   AppText();
 }

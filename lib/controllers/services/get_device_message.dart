@@ -19,10 +19,11 @@ class NormalMethodCall {
     print("service called");
     List<dynamic> deviceValue = [];
     try {
-      List<dynamic>? bluetoothDevice = await channel.invokeMethod(
-        "scanBluetoothDevice",
-      );
+      print("i am in try");
+      List<dynamic>? bluetoothDevice =
+          await channel.invokeMethod("scanBluetoothDevice");
       deviceValue = bluetoothDevice!;
+      print("try done");
     } catch (e) {
       print("exception: ${e}");
     }

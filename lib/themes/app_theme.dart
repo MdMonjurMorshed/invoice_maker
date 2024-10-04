@@ -20,7 +20,7 @@ class AppTheme {
             titleTextStyle: appText.appBarTitle),
         floatingActionButtonTheme: FloatingActionButtonThemeData(
             foregroundColor: Colors.white,
-            backgroundColor: Colors.purple[400],
+            backgroundColor: Colors.black,
             elevation: 10));
   }
 }

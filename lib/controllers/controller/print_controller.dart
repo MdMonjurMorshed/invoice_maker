@@ -6,6 +6,7 @@ class PrintController extends GetxController {
   RxList checkList = [].obs;
   RxBool bluetoothStatus = true.obs;
   RxList bluetoothDevices = [].obs;
+  RxBool scanForBluetoothDevice = false.obs;
   // NormalMethodCall normalMethodCall = NormalMethodCall();
 
   Future<String> getMethodCallData() async {
