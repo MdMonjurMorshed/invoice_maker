@@ -7,6 +7,8 @@ import 'package:swad_electric__bill_maker/controllers/controller/radio_button_co
 import 'package:swad_electric__bill_maker/themes/app_theme.dart';
 import 'package:swad_electric__bill_maker/view/available_bluetooth_device.dart';
 
+import '../controllers/services/get_device_message.dart';
+
 class LandingPage extends StatelessWidget {
   const LandingPage({super.key});
 
@@ -703,10 +705,12 @@ class LandingPage extends StatelessWidget {
                               ),
                               GestureDetector(
                                 onTap: () {
-                                  Get.to(
-                                    BlueToothDevicesNearBy(),
-                                    transition: Transition.rightToLeft,
-                                  );
+                                  // Get.to(
+                                  //   BlueToothDevicesNearBy(),
+                                  //   transition: Transition.rightToLeft,
+                                  // );
+
+                                  NormalMethodCall.connectDeviceAndPrint();
                                 },
                                 child: Container(
                                   height: mediaWidth / 11,

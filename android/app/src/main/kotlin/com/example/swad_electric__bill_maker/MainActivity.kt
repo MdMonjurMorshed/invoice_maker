@@ -16,9 +16,10 @@ import android.Manifest
 import androidx.core.app.ActivityCompat
 import android.location.LocationManager
 import android.provider.Settings
-
-
-
+import java.util.UUID
+import java.io.OutputStream
+import android.bluetooth.BluetoothSocket
+import java.io.IOException
 
 
 class MainActivity: FlutterActivity() {
@@ -71,13 +72,93 @@ class MainActivity: FlutterActivity() {
               discoverDevices(result)
             
             
-           }
+           }else if(call.method == "connectDeviceAndPrint"){
+                printAndConnect(result)
+
+            }
 
             else{
                 result.notImplemented()
             }
         }
 
+    }
+
+private  fun printAndConnect(result: MethodChannel.Result){
+
+    val pairedDevice:Set<BluetoothDevice> = bluetoothAdapter!!.bondedDevices
+
+    Log.d("pairedDevice","$pairedDevice")
+    for (device in pairedDevice){
+        val bluetoothDevice: BluetoothDevice = bluetoothAdapter.getRemoteDevice("$device")
+
+        if (isDeviceConnected(bluetoothDevice)){
+
+            val uuids = device.uuids
+            if (uuids != null && uuids.isNotEmpty()) {
+                // Use the first UUID (or iterate over if needed)
+                val uuid = uuids[0].uuid
+                val data = mapOf(
+                    "this" to "this is data"
+                )
+                printData(bluetoothDevice,uuid,data)
+
+            }
+
+        }else{
+            Log.d("notConnected","no device is connected right now")
+        }
+    }
+
+
+
+}
+
+private  fun  printData(device: BluetoothDevice,uuid: UUID,data:Map<String,Any>){
+     Log.d("mapData","${data["this"].toString()}")
+    var socket: BluetoothSocket? = null
+    socket = device.createRfcommSocketToServiceRecord(uuid)
+    try {
+        Log.d("devicePrint","$device")
+        Log.d("uuid","$uuid")
+
+        Log.d("socket","$socket")
+        Log.d("connection","${socket!!.connect()}")
+        socket!!.connect()
+
+        Log.d("bluetoothSocket","bluetooth socket is connected")
+        // Get the output stream to send data to the printer
+
+        val outputStream: OutputStream = socket.outputStream
+        outputStream.write(data["this"].toString().toByteArray())
+        outputStream.flush()
+        Log.d("printed","data is printed")
+        outputStream.close()
+        // Close the socket
+
+
+    }catch (e:IOException){
+
+        socket!!.close()
+        e.printStackTrace()
+        Log.d("printError","${e.message}")
+    }
+
+
+
+}
+
+
+private fun isDeviceConnected(device: BluetoothDevice): Boolean {
+          Log.d("device","$device")
+        try {
+            // Using reflection to check if the Bluetooth device is connected
+            val method = device.javaClass.getMethod("isConnected")
+            return method.invoke(device) as Boolean
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return false
     }
 
 private fun discoverDevices(result: MethodChannel.Result) {

@@ -41,4 +41,10 @@ class NormalMethodCall {
     }
     return isBluetoothAdapterEnabled!;
   }
+
+  static Future<String> connectDeviceAndPrint()async{
+
+    final printStatus = await channel.invokeMethod("connectDeviceAndPrint");
+    return printStatus;
+  }
 }
