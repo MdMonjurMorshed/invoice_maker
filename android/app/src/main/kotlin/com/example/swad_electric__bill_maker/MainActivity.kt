@@ -20,6 +20,9 @@ import java.util.UUID
 import java.io.OutputStream
 import android.bluetooth.BluetoothSocket
 import java.io.IOException
+import android.bluetooth.BluetoothClass
+import android.widget.Toast
+
 
 
 class MainActivity: FlutterActivity() {
@@ -73,7 +76,8 @@ class MainActivity: FlutterActivity() {
             
             
            }else if(call.method == "connectDeviceAndPrint"){
-                printAndConnect(result)
+                printAndConnect()
+                result.success("success")
 
             }
 
@@ -84,15 +88,25 @@ class MainActivity: FlutterActivity() {
 
     }
 
-private  fun printAndConnect(result: MethodChannel.Result){
+private  fun printAndConnect(){
 
     val pairedDevice:Set<BluetoothDevice> = bluetoothAdapter!!.bondedDevices
 
     Log.d("pairedDevice","$pairedDevice")
     for (device in pairedDevice){
-        val bluetoothDevice: BluetoothDevice = bluetoothAdapter.getRemoteDevice("$device")
+        val bluetoothDevice: BluetoothDevice = bluetoothAdapter!!.getRemoteDevice("$device")
+        val deviceClass: Int = bluetoothDevice.bluetoothClass.deviceClass
 
         if (isDeviceConnected(bluetoothDevice)){
+
+            when(deviceClass){
+
+                BluetoothClass.Device.PHONE_SMART -> {
+                    Log.d("DeviceType","this is phone")
+                    Toast.makeText(this, "this is a smart phone", Toast.LENGTH_SHORT).show()
+                }
+            }
+
 
             val uuids = device.uuids
             if (uuids != null && uuids.isNotEmpty()) {
@@ -101,7 +115,7 @@ private  fun printAndConnect(result: MethodChannel.Result){
                 val data = mapOf(
                     "this" to "this is data"
                 )
-                printData(bluetoothDevice,uuid,data)
+//                printData(bluetoothDevice,uuid,data)
 
             }
 
@@ -116,33 +130,118 @@ private  fun printAndConnect(result: MethodChannel.Result){
 
 private  fun  printData(device: BluetoothDevice,uuid: UUID,data:Map<String,Any>){
      Log.d("mapData","${data["this"].toString()}")
+     Log.d("printUUID","$uuid")
     var socket: BluetoothSocket? = null
+
     socket = device.createRfcommSocketToServiceRecord(uuid)
-    try {
-        Log.d("devicePrint","$device")
-        Log.d("uuid","$uuid")
 
-        Log.d("socket","$socket")
-        Log.d("connection","${socket!!.connect()}")
-        socket!!.connect()
-
-        Log.d("bluetoothSocket","bluetooth socket is connected")
-        // Get the output stream to send data to the printer
-
-        val outputStream: OutputStream = socket.outputStream
-        outputStream.write(data["this"].toString().toByteArray())
-        outputStream.flush()
-        Log.d("printed","data is printed")
-        outputStream.close()
-        // Close the socket
+    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+        // Android 12 (API 31) and above
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN)
+            != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT)
+            != PackageManager.PERMISSION_GRANTED) {
+            // Request Bluetooth permissions for Android 12+
+            ActivityCompat.requestPermissions(this, arrayOf(
+                Manifest.permission.BLUETOOTH_SCAN,
+                Manifest.permission.BLUETOOTH_CONNECT,
+                Manifest.permission.BLUETOOTH_ADVERTISE
+            ), REQUEST_BLUETOOTH_PERMISSIONS)
 
 
-    }catch (e:IOException){
+        }else{
+            if (isLocationEnabled()){
+                if (bluetoothAdapter?.isDiscovering == true){
+                    Log.d("Discovering","bluetooth is discovering")
+                }
+                if (device.bondState != BluetoothDevice.BOND_BONDED) {
+                    //device.createBond()  // Ensure pairing is completed
+                    Log.d("notPaired","device not paired")
+                }
+                try {
+                    Log.d("devicePrint","$device")
+                    Log.d("uuid","$uuid")
 
-        socket!!.close()
-        e.printStackTrace()
-        Log.d("printError","${e.message}")
+                    Log.d("socket","$socket")
+                    Log.d("connection","${socket!!.connect()}")
+                    socket!!.connect()
+
+                    Log.d("bluetoothSocket","bluetooth socket is connected")
+                    // Get the output stream to send data to the printer
+
+                    val outputStream: OutputStream = socket.outputStream
+                    outputStream.write(data["this"].toString().toByteArray())
+                    outputStream.flush()
+                    Log.d("printed","data is printed")
+                    outputStream.close()
+                    socket!!.close()
+                    // Close the socket
+
+
+                }catch (e:IOException){
+
+
+                    e.printStackTrace()
+                    Log.d("printError","${e.message}")
+                }
+
+            }else{
+                openLocationSettings()
+            }
+        }
+    } else if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+        // Android 6.0 (API 23) to Android 11 (API 30)
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+            != PackageManager.PERMISSION_GRANTED) {
+            // Request Location permission for Bluetooth scanning (Android 6 to 11)
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), REQUEST_LOCATION_PERMISSION)
+        }else{
+            if (isLocationEnabled()){
+                if (bluetoothAdapter?.isDiscovering == true){
+                    Log.d("Discovering","bluetooth is discovering")
+                }
+                if (device.bondState != BluetoothDevice.BOND_BONDED) {
+                    //device.createBond()  // Ensure pairing is completed
+                    Log.d("notPaired","device not paired")
+                }
+                try {
+                    Log.d("devicePrint","$device")
+                    Log.d("uuid","$uuid")
+
+                    Log.d("socket","$socket")
+                    Log.d("connection","${socket!!.connect()}")
+                    socket!!.connect()
+
+                    Log.d("bluetoothSocket","bluetooth socket is connected")
+                    // Get the output stream to send data to the printer
+
+                    val outputStream: OutputStream = socket.outputStream
+                    outputStream.write(data["this"].toString().toByteArray())
+                    outputStream.flush()
+                    Log.d("printed","data is printed")
+                    outputStream.close()
+                    socket!!.close()
+                    // Close the socket
+
+
+                }catch (e:IOException){
+
+
+                    e.printStackTrace()
+                    Log.d("printError","${e.message}")
+                }
+
+            }else{
+                openLocationSettings()
+            }
+
+
+
+        }
+
     }
+
+
+
 
 
 

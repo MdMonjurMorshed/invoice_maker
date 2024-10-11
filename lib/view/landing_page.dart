@@ -704,13 +704,13 @@ class LandingPage extends StatelessWidget {
                                 width: mediaWidth / 5,
                               ),
                               GestureDetector(
-                                onTap: () {
+                                onTap: () async{
                                   // Get.to(
                                   //   BlueToothDevicesNearBy(),
                                   //   transition: Transition.rightToLeft,
                                   // );
 
-                                  NormalMethodCall.connectDeviceAndPrint();
+                                  await NormalMethodCall.connectDeviceAndPrint();
                                 },
                                 child: Container(
                                   height: mediaWidth / 11,
