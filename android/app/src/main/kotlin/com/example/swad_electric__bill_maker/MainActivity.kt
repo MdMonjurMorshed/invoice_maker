@@ -93,36 +93,166 @@ private  fun printAndConnect(){
     val pairedDevice:Set<BluetoothDevice> = bluetoothAdapter!!.bondedDevices
 
     Log.d("pairedDevice","$pairedDevice")
-    for (device in pairedDevice){
-        val bluetoothDevice: BluetoothDevice = bluetoothAdapter!!.getRemoteDevice("$device")
-        val deviceClass: Int = bluetoothDevice.bluetoothClass.deviceClass
 
-        if (isDeviceConnected(bluetoothDevice)){
+    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+        // Android 12 (API 31) and above
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN)
+            != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT)
+            != PackageManager.PERMISSION_GRANTED) {
+            // Request Bluetooth permissions for Android 12+
+            ActivityCompat.requestPermissions(this, arrayOf(
+                Manifest.permission.BLUETOOTH_SCAN,
+                Manifest.permission.BLUETOOTH_CONNECT,
+                Manifest.permission.BLUETOOTH_ADVERTISE
+            ), REQUEST_BLUETOOTH_PERMISSIONS)
 
-            when(deviceClass){
-
-                BluetoothClass.Device.PHONE_SMART -> {
-                    Log.d("DeviceType","this is phone")
-                    Toast.makeText(this, "this is a smart phone", Toast.LENGTH_SHORT).show()
-                }
-            }
-
-
-            val uuids = device.uuids
-            if (uuids != null && uuids.isNotEmpty()) {
-                // Use the first UUID (or iterate over if needed)
-                val uuid = uuids[0].uuid
-                val data = mapOf(
-                    "this" to "this is data"
-                )
-//                printData(bluetoothDevice,uuid,data)
-
-            }
 
         }else{
-            Log.d("notConnected","no device is connected right now")
+            if (isLocationEnabled()){
+                for (device in pairedDevice){
+                    Log.d("deviceAddress","${device.address}")
+                    val bluetoothDevice: BluetoothDevice = bluetoothAdapter!!.getRemoteDevice("${device.address}")
+                    Log.d("deviceAddress","working")
+
+                    val deviceClass: Int = bluetoothDevice.bluetoothClass.deviceClass
+                    Log.d("DeviceClass","$deviceClass")
+                    when(deviceClass){
+
+                        BluetoothClass.Device.Major.PHONE -> {
+                            Log.d("DeviceType","this is phone")
+                            Toast.makeText(this, "this is a smart phone", Toast.LENGTH_SHORT).show()
+                        }
+                        BluetoothClass.Device.Major.COMPUTER ->{
+                            Toast.makeText(this, "Connected device is Laptop", Toast.LENGTH_SHORT).show()
+                            Log.d("DeviceType","this is laptop")
+                        }
+                        BluetoothClass.Device.Major.IMAGING-> {
+                            Toast.makeText(this, "Connected device is a printer", Toast.LENGTH_SHORT).show()
+                            Log.d("DeviceType","this is printer")
+                        }
+                    }
+
+                    if (isDeviceConnected(bluetoothDevice)){
+
+
+
+
+                        val uuids = device.uuids
+                        if (uuids != null && uuids.isNotEmpty()) {
+                            // Use the first UUID (or iterate over if needed)
+                            val uuid = uuids[0].uuid
+                            val data = mapOf(
+                                "this" to "this is data"
+                            )
+//                printData(bluetoothDevice,uuid,data)
+
+                        }
+
+                    }else{
+                        Log.d("notConnected","no device is connected right now")
+                    }
+                }
+            }else{
+                openLocationSettings()
+            }
         }
+    } else if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+        // Android 6.0 (API 23) to Android 11 (API 30)
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+            != PackageManager.PERMISSION_GRANTED) {
+            // Request Location permission for Bluetooth scanning (Android 6 to 11)
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), REQUEST_LOCATION_PERMISSION)
+        }else{
+            if (isLocationEnabled()){
+                for (device in pairedDevice){
+                    Log.d("deviceName","${device.name}")
+                    Log.d("deviceAddress","${device.address}")
+                    val bluetoothDevice: BluetoothDevice = bluetoothAdapter!!.getRemoteDevice("$device")
+                    val deviceClass = bluetoothDevice.bluetoothClass.deviceClass
+                    val majorDevice = bluetoothDevice.bluetoothClass.majorDeviceClass
+                    val minorDevice = deviceClass and 0xFF
+
+                    Log.d("majorDevice","$majorDevice")
+                    Log.d("minorDevice","$minorDevice")
+                    Log.d("deviceClass","$deviceClass")
+
+                    if (majorDevice == BluetoothClass.Device.Major.HEALTH) {
+                        Log.d("inMajor","i am in major and got imaging device")
+                        val uuids = device.uuids
+                        if (uuids != null && uuids.isNotEmpty()) {
+                            // Use the first UUID (or iterate over if needed)
+                            val uuid = uuids[0].uuid
+                            val data = mapOf(
+                                "this" to "this is data"
+                            )
+                printData(bluetoothDevice,uuid,data)
+
+                        }
+
+                    }
+                    if (majorDevice == BluetoothClass.Device.Major.IMAGING){
+                        Log.d("inMajor","i am in imaging device")
+                    }
+                    if (majorDevice == BluetoothClass.Device.Major.PHONE){
+                        Log.d("inMajor","it's a phone")
+                    }
+
+//                    if (deviceClass == 0x1C){
+//                        Log.d("deviceClas","$deviceClass")
+//                    }
+
+//                    when(deviceClass){
+////                        Log.d("InWhen","i am in when")
+////                        BluetoothClass.Device.Minor.IMAGING -> {
+////                            Log.d("minorDevice","in the  minor device")
+////
+////                                }
+//
+//                            deviceClass == 0x1C {
+//                                Log.Ded("BluetoothDevice", "Device is a Printer")
+//                            } else {
+//                                Log.d(
+//                                    "BluetoothDevice",
+//                                    "Device is an Imaging device but not a Printer"
+//                                )
+//                            }
+//                        }
+
+
+                    if (isDeviceConnected(bluetoothDevice)){
+
+                        when(deviceClass){
+
+                            BluetoothClass.Device.PHONE_SMART -> {
+                                Log.d("DeviceType","this is phone")
+                                Toast.makeText(this, "this is a smart phone", Toast.LENGTH_SHORT).show()
+                            }
+                            BluetoothClass.Device.COMPUTER_LAPTOP ->{
+                                Toast.makeText(this, "Connected device is Laptop", Toast.LENGTH_SHORT).show()
+                            }
+                            BluetoothClass.Device.Major.IMAGING-> {
+                                Toast.makeText(this, "Connected device is a printer", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+
+
+
+
+                    }else{
+                        Log.d("notConnected","no device is connected right now")
+                    }
+                }
+
+            }else{
+                openLocationSettings()
+            }
+
+
+
+        }
+
     }
+
 
 
 
@@ -204,11 +334,11 @@ private  fun  printData(device: BluetoothDevice,uuid: UUID,data:Map<String,Any>)
                     Log.d("notPaired","device not paired")
                 }
                 try {
-                    Log.d("devicePrint","$device")
-                    Log.d("uuid","$uuid")
-
-                    Log.d("socket","$socket")
-                    Log.d("connection","${socket!!.connect()}")
+//                    Log.d("devicePrint","$device")
+//                    Log.d("uuid","$uuid")
+//
+//                    Log.d("socket","$socket")
+//                    Log.d("connection","${socket!!.connect()}")
                     socket!!.connect()
 
                     Log.d("bluetoothSocket","bluetooth socket is connected")
@@ -219,15 +349,22 @@ private  fun  printData(device: BluetoothDevice,uuid: UUID,data:Map<String,Any>)
                     outputStream.flush()
                     Log.d("printed","data is printed")
                     outputStream.close()
-                    socket!!.close()
+
                     // Close the socket
 
 
                 }catch (e:IOException){
 
 
-                    e.printStackTrace()
+//                    e.printStackTrace()
                     Log.d("printError","${e.message}")
+
+                    try {
+                        socket!!.close()
+                        Log.d("bluetoothSocket","bluetooth socket is closed")
+                    }catch (e:IOException){
+                        Log.d("socketClosingError","${e.message}")
+                    }
                 }
 
             }else{
