@@ -339,14 +339,18 @@ private  fun  printData(device: BluetoothDevice,uuid: UUID,data:Map<String,Any>)
 //
 //                    Log.d("socket","$socket")
 //                    Log.d("connection","${socket!!.connect()}")
-                    socket!!.connect()
+                    if (!socket!!.isConnected){
+                        socket!!.connect()
+                        Log.d("bluetoothSocket","bluetooth socket is connected")
+                    }
 
-                    Log.d("bluetoothSocket","bluetooth socket is connected")
+
                     // Get the output stream to send data to the printer
 
-                    val outputStream: OutputStream = socket.outputStream
-                    outputStream.write(data["this"].toString().toByteArray())
+                    val outputStream: OutputStream = socket!!.outputStream
+                    outputStream.write("hello world\r\n".toByteArray(Charsets.UTF_8))
                     outputStream.flush()
+                    Log.d("printedData","${data["this"]}")
                     Log.d("printed","data is printed")
                     outputStream.close()
 
