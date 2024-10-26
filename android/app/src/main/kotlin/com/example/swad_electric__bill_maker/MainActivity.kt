@@ -22,6 +22,8 @@ import android.bluetooth.BluetoothSocket
 import java.io.IOException
 import android.bluetooth.BluetoothClass
 import android.widget.Toast
+import android.os.Handler
+import android.os.Looper
 
 
 
@@ -76,8 +78,9 @@ class MainActivity: FlutterActivity() {
             
             
            }else if(call.method == "connectDeviceAndPrint"){
-                printAndConnect()
-                result.success("success")
+//                printAndConnect()
+//                result.success("success")
+                connectBluetoothDevice()
 
             }
 
@@ -86,6 +89,130 @@ class MainActivity: FlutterActivity() {
             }
         }
 
+    }
+
+private  fun connectBluetoothDevice() {
+    val pairedDevice:Set<BluetoothDevice> = bluetoothAdapter!!.bondedDevices
+    Thread {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+            // Android 12 (API 31) and above
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN)
+                != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.BLUETOOTH_CONNECT
+                )
+                != PackageManager.PERMISSION_GRANTED
+            ) {
+                // Request Bluetooth permissions for Android 12+
+                ActivityCompat.requestPermissions(
+                    this, arrayOf(
+                        Manifest.permission.BLUETOOTH_SCAN,
+                        Manifest.permission.BLUETOOTH_CONNECT,
+                        Manifest.permission.BLUETOOTH_ADVERTISE
+                    ), REQUEST_BLUETOOTH_PERMISSIONS
+                )
+
+
+            } else {
+                if (isLocationEnabled()) {
+
+
+                } else {
+                    openLocationSettings()
+                }
+            }
+        } else if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            // Android 6.0 (API 23) to Android 11 (API 30)
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED
+            ) {
+                // Request Location permission for Bluetooth scanning (Android 6 to 11)
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                    REQUEST_LOCATION_PERMISSION
+                )
+            } else {
+                if (isLocationEnabled()) {
+                    for(device in pairedDevice) {
+                        val bluetoothDevice: BluetoothDevice =
+                            bluetoothAdapter!!.getRemoteDevice("${device.address}")
+                        Log.d("deviceAddress", "working")
+
+                        val deviceClass: Int = bluetoothDevice.bluetoothClass.deviceClass
+                        Log.d("DeviceClass", "$deviceClass")
+                        val majorDevice = bluetoothDevice.bluetoothClass.majorDeviceClass
+
+                        if(majorDevice == BluetoothClass.Device.Major.HEALTH){
+                            processDeviceData(bluetoothDevice)
+                            break
+//                            val uuids = device.uuids
+//                            if (uuids != null && uuids.isNotEmpty()) {
+//                                // Use the first UUID (or iterate over if needed)
+//                                val uuid = uuids[0].uuid
+//                                val data = mapOf(
+//                                    "this" to "this is data"
+//                                )
+//                                printData(bluetoothDevice,uuid,data)
+
+                            }
+
+                        }
+
+
+
+
+                } else {
+                    openLocationSettings()
+                }
+
+
+            }
+
+        }
+
+    }.start()
+}
+private fun processDeviceData(device:BluetoothDevice){
+    Thread{
+        val uuids = device.uuids
+        Log.d("listOfUUID","$uuids")
+        if (uuids != null && uuids.isNotEmpty()) {
+            // Use the first UUID (or iterate over if needed)
+            val uuid = uuids[0].uuid
+            Log.d("printUUID","${uuid.javaClass}")
+            val data = mapOf(
+                "this" to "this is data"
+            )
+            var socket: BluetoothSocket? = device.createRfcommSocketToServiceRecord(uuid)
+
+            Log.d("socketConnection","$socket")
+            try {
+               socket!!.connect()
+               sendKeepAlive(socket!!)
+            }catch (e:IOException){
+                 Log.d("socketException","${e.message}")
+            }
+
+
+
+        }
+    }.start()
+}
+
+    fun sendKeepAlive(socket: BluetoothSocket) {
+        val handler = Handler(Looper.getMainLooper())
+        val keepAliveRunnable = object : Runnable {
+            override fun run() {
+                try {
+                    socket.outputStream.write("ping".toByteArray())
+                    handler.postDelayed(this, 2000)  // Send every 2 seconds
+                } catch (e: IOException) {
+                    Log.d("KeepAlive", "Failed to send keep-alive: ${e.message}")
+                }
+            }
+        }
+        handler.post(keepAliveRunnable)
     }
 
 private  fun printAndConnect(){
@@ -167,7 +294,8 @@ private  fun printAndConnect(){
                 for (device in pairedDevice){
                     Log.d("deviceName","${device.name}")
                     Log.d("deviceAddress","${device.address}")
-                    val bluetoothDevice: BluetoothDevice = bluetoothAdapter!!.getRemoteDevice("$device")
+                    val bluetoothDevice: BluetoothDevice = bluetoothAdapter!!.getRemoteDevice("${device.address}")
+                    Log.d("connectedDevice","$bluetoothDevice")
                     val deviceClass = bluetoothDevice.bluetoothClass.deviceClass
                     val majorDevice = bluetoothDevice.bluetoothClass.majorDeviceClass
                     val minorDevice = deviceClass and 0xFF
@@ -178,6 +306,7 @@ private  fun printAndConnect(){
 
                     if (majorDevice == BluetoothClass.Device.Major.HEALTH) {
                         Log.d("inMajor","i am in major and got imaging device")
+                        pairDevice(bluetoothDevice)
                         val uuids = device.uuids
                         if (uuids != null && uuids.isNotEmpty()) {
                             // Use the first UUID (or iterate over if needed)
@@ -298,11 +427,15 @@ private  fun  printData(device: BluetoothDevice,uuid: UUID,data:Map<String,Any>)
                     Log.d("bluetoothSocket","bluetooth socket is connected")
                     // Get the output stream to send data to the printer
 
-                    val outputStream: OutputStream = socket.outputStream
-                    outputStream.write(data["this"].toString().toByteArray())
+                    val outputStream: OutputStream = socket!!.outputStream
+//                    outputStream.write(data["this"].toString().toByteArray())
+//                    outputStream.flush()
+//                    Log.d("printed","data is printed")
+//                    outputStream.close
+                    val escPosCommand = "\u001B\u0040"  // ESC @ (Initialize printer)
+                    val dataToPrint = "$escPosCommand${data["this"]}\n"  // ESC @ followed by your data
+                    outputStream.write(dataToPrint.toByteArray(Charsets.UTF_8))
                     outputStream.flush()
-                    Log.d("printed","data is printed")
-                    outputStream.close()
                     socket!!.close()
                     // Close the socket
 
@@ -348,15 +481,19 @@ private  fun  printData(device: BluetoothDevice,uuid: UUID,data:Map<String,Any>)
                     // Get the output stream to send data to the printer
 
                     val outputStream: OutputStream = socket!!.outputStream
-                    outputStream.write("hello world\r\n".toByteArray(Charsets.UTF_8))
+                    Log.d("outputStream","$outputStream")
+                    val escPosCommand = "\u001B\u0040"  // ESC @ (Initialize printer)
+                    val dataToPrint = "$escPosCommand${data["this"]}\n"  // ESC @ followed by your data
+                    outputStream.write(dataToPrint.toByteArray(Charsets.UTF_8))
                     outputStream.flush()
                     Log.d("printedData","${data["this"]}")
+                    Thread.sleep(5000)
                     Log.d("printed","data is printed")
                     outputStream.close()
 
                     // Close the socket
 
-
+                    socket!!.close()
                 }catch (e:IOException){
 
 
@@ -388,6 +525,14 @@ private  fun  printData(device: BluetoothDevice,uuid: UUID,data:Map<String,Any>)
 
 }
 
+private fun pairDevice(device: BluetoothDevice) {
+        try {
+            val method = device.javaClass.getMethod("createBond")
+            method.invoke(device)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
 
 private fun isDeviceConnected(device: BluetoothDevice): Boolean {
           Log.d("device","$device")
