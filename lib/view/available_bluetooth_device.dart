@@ -67,12 +67,12 @@ class BlueToothDevicesNearBy extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                ' Device: ${printController.bluetoothDevices.value[index]["name"]} ',
+                                ' Device: ${printController.bluetoothDevices.value} ',
                                 style: AppTheme
                                     .appText.availableBluetoothTextStyle,
                               ),
                               Text(
-                                ' Address: ${printController.bluetoothDevices.value[index]["address"]} ',
+                                ' Address: ${printController.bluetoothDevices.value} ',
                                 style: AppTheme
                                     .appText.availableBluetoothTextStyle,
                               )

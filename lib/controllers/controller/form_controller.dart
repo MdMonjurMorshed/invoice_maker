@@ -9,6 +9,9 @@ class FormController extends GetxController {
   RxDouble totalAmmountText = 0.0.obs;
   TextEditingController chargesTextController = TextEditingController();
   TextEditingController complainInTextController = TextEditingController();
+  TextEditingController accountNumberTextController = TextEditingController();
+  TextEditingController phoneNumberTextController = TextEditingController();
+  TextEditingController energyCostTextController = TextEditingController();
 
   RxString customerPhoneNumberText = ''.obs;
 

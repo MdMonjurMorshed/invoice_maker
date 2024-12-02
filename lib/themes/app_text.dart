@@ -57,6 +57,10 @@ class AppText {
   // inside app body text ends
 
 
+  // dashboard text starts
+  final  appDashboardHeaderText = TextStyle(fontSize:20,color: Colors.white );
+  // dashboard text ends
+
 
   AppText();
 }

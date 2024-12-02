@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:swad_electric__bill_maker/view/home_page.dart';
 import 'package:swad_electric__bill_maker/view/landing_page.dart';
 
 class BillMakerSplashScreen extends StatelessWidget {
@@ -10,7 +11,7 @@ class BillMakerSplashScreen extends StatelessWidget {
     Future.delayed(Duration(seconds: 3), () {
       // Navigator.pushReplacement(
       //     context, GetPageRoute(page: () => LandingPage()));
-      Get.off(LandingPage());
+      Get.off(HomePage());
     });
 
     final height = MediaQuery.of(context).size.height;

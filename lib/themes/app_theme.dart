@@ -8,13 +8,14 @@ class AppTheme {
   static final appText = AppText();
   static final appIcons = AppIcons();
 
-  
-
   AppTheme._();
 
   static ThemeData appThemeData() {
     return ThemeData(
         primaryColor: Colors.blue,
+        elevatedButtonTheme: ElevatedButtonThemeData(
+            style: ButtonStyle(
+                backgroundColor: MaterialStatePropertyAll(Colors.white))),
         appBarTheme: AppBarTheme(
             backgroundColor: appColor.appBarColor,
             titleTextStyle: appText.appBarTitle),

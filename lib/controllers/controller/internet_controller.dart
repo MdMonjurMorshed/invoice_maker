@@ -10,11 +10,8 @@ class InternetController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    _connectivity.onConnectivityChanged
-        .listen((List<ConnectivityResult> results) {
-      for (var result in results) {
-        _updateConnectionStatus(result);
-      }
+    _connectivity.onConnectivityChanged.listen((ConnectivityResult results) {
+      _updateConnectionStatus(results);
     });
 
     // _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
