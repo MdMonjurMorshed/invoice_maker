@@ -803,8 +803,7 @@ private  fun getBondedDevice(result:MethodChannel.Result){
     }
 
 private  fun connectBluetoothDevice(result: MethodChannel.Result) {
-    val pairedDevice:Set<BluetoothDevice>? = bluetoothAdapter!!.bondedDevices
-    Thread {
+   
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
             // Android 12 (API 31) and above
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN)
@@ -827,6 +826,7 @@ private  fun connectBluetoothDevice(result: MethodChannel.Result) {
             } else {
                 if (isLocationEnabled()) {
                     //  val targetDevice: BluetoothDevice = pairedDevice!!.find { it.name == "X5h-F31B" }
+                    val pairedDevice:Set<BluetoothDevice>? = bluetoothAdapter!!.bondedDevices
                     val targetDevice: BluetoothDevice? = pairedDevice!!.find { it.name == "X5h-F31B" }
                     Log.d("targetDevice","$targetDevice")
                     // Log.d("bondedDevice","$pairedDevice")
@@ -865,6 +865,7 @@ private  fun connectBluetoothDevice(result: MethodChannel.Result) {
             } else {
                 if (isLocationEnabled()) {
                     // val targetDevice: BluetoothDevice = pairedDevice.find { it.name == "X5h-F31B" }
+                    val pairedDevice:Set<BluetoothDevice>? = bluetoothAdapter!!.bondedDevices
                     val targetDevice: BluetoothDevice? = pairedDevice!!.find{it.name == "X5h-F31B"}
                     Log.d("targetDevice","$targetDevice")
                     // Log.d("bondedDevice","$pairedDevice")
@@ -897,7 +898,7 @@ private  fun connectBluetoothDevice(result: MethodChannel.Result) {
 
         }
 
-    }.start()
+   
 }
 private fun processDeviceData(device:BluetoothDevice){
     Thread{
